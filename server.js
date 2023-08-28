@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 app.use(cors());
 app.use(fileupload());
 
-Route
+// Route
 app.get("/", (req, res) => {
   res.send("Home Paage");
 });
@@ -55,7 +55,7 @@ app.post("/api/sendemail", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 5058;
+const PORT = process.env.PORT || 5051;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}...`);
 });
