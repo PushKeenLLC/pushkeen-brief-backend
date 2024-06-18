@@ -21,10 +21,10 @@ app.get("/", (_, res) => {
 app.post("/api/sendemail", async (req, res) => {
   const { name, phone, email, text, services } = req.body;
   try {
-    const send_to = process.env.EMAIL_HEY;
+    const send_to = [process.env.EMAIL_HEY, process.env.EMAIL_KPM];
     const sent_from = process.env.EMAIL_HEY;
     const reply_to = process.env.EMAIL_HEY;
-    const subject = "Заявка с сайта pushkeen.ru";
+    const subject = "Бриф  с сайта pushkeen.ru";
     const message = `
       <p><b>Имя</b>: ${name}</p>
       <p><b>Телефон</b>: ${phone}</p>
