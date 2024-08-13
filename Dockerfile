@@ -18,4 +18,4 @@ COPY . .
 EXPOSE 5051
 
 # Запускаем приложение через скрипт
-CMD [ "node", "server.js" ]
+CMD [ "npm", "start" ]

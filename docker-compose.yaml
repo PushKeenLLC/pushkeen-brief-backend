@@ -6,4 +6,4 @@ services:
     container_name: pushkeen-brief-backend
     restart: unless-stopped
     ports:
-      - 5051:3000
+      - 5051:5051
