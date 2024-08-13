@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  pushkeen-brief-backend:
+    image: pushkeen/pushkeen-brief-backend:latest
+    container_name: pushkeen-brief-backend
+    restart: unless-stopped
+    ports:
+      - 5051:3000
