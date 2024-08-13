@@ -4,6 +4,11 @@ services:
   pushkeen-brief-backend:
     image: pushkeen/pushkeen-brief-backend:latest
     container_name: pushkeen-brief-backend
+    environment:
+      EMAIL_HOST: ${EMAIL_HOST}
+      EMAIL_HEY: ${EMAIL_HEY}
+      EMAIL_PASS_HEY: ${EMAIL_PASS_HEY}
+      EMAIL_KPM: ${EMAIL_KPM}
     restart: unless-stopped
     ports:
       - 5051:5051
