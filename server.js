@@ -18,7 +18,6 @@ app.get("/", (_, res) => {
   res.send("Home Page");
 });
 
-
 app.post("/api/sendemail", async (req, res) => {
   const { name, phone, email, text, services } = req.body;
   try {
@@ -26,6 +25,7 @@ app.post("/api/sendemail", async (req, res) => {
     const sent_from = process.env.EMAIL_HEY;
     const reply_to = process.env.EMAIL_HEY;
     const subject = "Бриф  с сайта pushkeen.ru";
+
     const message = `
       <p><b>Имя</b>: ${name}</p>
       <p><b>Телефон</b>: ${phone}</p>
@@ -42,14 +42,7 @@ app.post("/api/sendemail", async (req, res) => {
       },
     ];
 
-    await sendEmail(
-      attachments,
-      subject,
-      message,
-      send_to,
-      sent_from,
-      reply_to
-    );
+    await sendEmail(attachments, subject, message, send_to, sent_from, reply_to);
     res.status(200).json({ success: true, message: "Email Sent" });
   } catch (error) {
     res.status(500).json(error.message);
@@ -64,109 +57,75 @@ app.post("/api/brief", async (req, res) => {
     projectName,
     companyName,
     fieldOfActivity,
+    products,
+    clients,
     competitors,
-    services,
-    audience,
     advantages,
-    clientProblems,
-    comparison,
-    qualityPhotos,
+    tasks,
+    deadlines,
+    offers,
     // technicalSpecifications,
-    idea,
+    site,
     sections,
-    sitePrototype,
+    stuff,
     // logo,
     // brandBook,
-    siteLove,
-    siteHate,
-    siteFunction,
-    sitePages,
+    favSites,
+    hateSites,
     features,
-    additionally,
+    other,
   } = req.body;
   try {
     const send_to = [process.env.EMAIL_HEY, process.env.EMAIL_KPM];
     const sent_from = process.env.EMAIL_HEY;
     const reply_to = process.env.EMAIL_HEY;
     const subject = "Бриф с сайта pushkeen.ru";
+
     const message = `
     <p><b>Имя</b>: ${name ? name : "-"}</p>
     <p><b>Телефон</b>: ${phone ? phone : "-"}</p>
     <p><b>Почта</b>: ${email ? email : "-"}</p>
     <p><b>Название проекта</b>: ${projectName ? projectName : "-"}</p>
 
+
       </br>
-      <p>ИНФОРМАЦИЯ О КОМПАНИИ</p>
-      <p><b>Название компании</b>: ${companyName ? companyName : "-"}</p>
-      <p><b>Сфера деятельности</b>: ${
-        fieldOfActivity ? fieldOfActivity : "-"
+      </br>
+      <p>КОМПАНИЯ И РЫНОК</p>
+      <p><b>Название вашей компании</b>: ${companyName ? companyName : "-"}</p>
+      <p><b>Расскажите, чем занимается ваша компания?</b>: ${fieldOfActivity ? fieldOfActivity : "-"}</p>
+      <p><b>Расскажите, какие продукты/услуги вы предлагаете клиентам?</b>: ${products ? products : "-"}</p>
+      <p><b>Кто ваши клиенты? Расскажите о сегментах вашей аудитории. Какой их сегментов вы считаете ключевым? Если вы планируете охватывать новые сегменты аудитории, расскажите, какие</b>: ${
+        clients ? clients : "-"
       }</p>
-      <p><b>Вы знаете ваших конкурентов в сети? Если да, дайте на них ссылки:</b>: ${
+      <p><b>Кто ваши ключевые конкуренты? По возможности, прикрепите ссылки на их сайты и/или социальные сети</b>: ${
         competitors ? competitors : "-"
       }</p>
+      <p><b>Какое преимущество выделяет вас среди конкурентов</b>: ${advantages ? advantages : "-"}</p>
+
 
       </br>
-      <p>ДЕЯТЕЛЬНОСТЬ ЗАКАЗЧИКА</p>
-      <p><b>Продукция, услуги</b>: ${services ? services : "-"}</p>
-      <p><b>Кто является целевой аудиторией вашего товара/услуги?</b>: ${
-        audience ? audience : "-"
-      }</p>
-      <p><b>Выделите ключевое преимущество продукта/услуги:</b>: ${
-        advantages ? advantages : "-"
-      }</p>
-      <p><b>С какими проблемами к вам приходит клиент?</b>: ${
-        clientProblems ? clientProblems : "-"
-      }</p>
-      <p><b>На что опирается клиент, сравнивая ваш продукт с продуктом конкурента? Какие критерии являются основными при принятии решении о покупке?</b>: ${comparison}</p>
-      <p><b>У вас есть качественные фото/видео материалы для сайта?</b>: ${
-        qualityPhotos ? qualityPhotos : "-"
+      </br>
+      <p>ОЖИДАНИЯ </p>
+      <p><b>Какую задачу должен решать продукт/проект?</b>: ${tasks ? tasks : "-"}</p>
+      <p><b>В какие сроки нужно завершить работу?</b>: ${deadlines ? deadlines : "-"}</p>
+      <p><b>Рассматриваете ли вы предложения от других компаний? Как вы будете выбирать партнёра? Когда вы планируете принять решение?</b>: ${
+        offers ? offers : "-"
       }</p>
 
-       </br>
-      <p>ПОДРОБНЕЕ О ПРОЕКТЕ</p>
-      <p><b>У вас есть ТЗ или пожелания по проекту?</b>: ${
-        req.files?.technicalSpecifications
-          ? "Название файла - " + req.files?.technicalSpecifications.name
-          : "-"
-      }</p>
-      <p><b>Есть ли у вас особая идея? Возможно у вас есть особое видение будущего сайта?</b>: ${
-        idea ? idea : "-"
-      }</p>
-      <p><b>Укажите предполагаемые основные разделы вашего будущего сайта (структуру)</b>: ${
-        sections ? sections : "-"
-      }</p>
-      <p><b>Есть ли у вас прототип будущего сайта?</b>: ${
-        sitePrototype ? sitePrototype : "-"
-      }</p>
-
-       </br>
-      <p>ДИЗАЙН</p>
-      <p>Вид дизайна</p>
-      <p><b>Логотип</b>: ${
-        req.files?.logo ? "Название файла - " + req.files.logo.name : "-"
-      }</p>
-      <p><b>Дополнительно</b>: ${
-        req.files?.brandBook
-          ? "Название файла - " + req.files.brandBook.name
-          : "-"
-      }</p>
-      <p><b>Сайты, которые нравятся</b>: ${siteLove ? siteLove : "-"}</p>
-      <p><b>Сайты, которые не нравятся</b>: ${siteHate ? siteHate : "-"}</p>
 
       </br>
-      <p>ФУНКЦИОНАЛЬНОСТЬ САЙТА</p>
-      <p><b>Какой сайт можно взять за пример полностью или с частью функционала. Опишите отличия и разницу</b>: ${
-        siteFunction ? siteFunction : "-"
+      </br>
+      <p>УСЛУГА: ВЕБ-РАЗРАБОТКА</p>
+      <p><b>Если у вас есть документ с ТЗ или уже готовый прототип, прикрепите его здесь</b>: ${
+        req.files?.technicalSpecifications ? "Название файла - " + req.files.technicalSpecifications.name : "-"
       }</p>
-      <p><b>Опишите какие страницы должны быть? (Главная страница, страницы категорий/разделов, страница «О нас»,…)</b>: ${
-        sitePages ? sitePages : "-"
-      }</p>
-      <p><b>Что из этого необходимо? (Админ панель, Перенос контента со старого сайта на новый, SEO оптимизация, Интеграция системы метрик)</b>: ${
-        features ? features : "-"
-      }</p>
-      <p><b>Дополнение, замечания, пожелания, требования по сайту</b>: ${
-        additionally ? additionally : "-"
-      }</p>
+      <p><b>Предполагаете ли вы создание одностраничного или многостраничного сайта?</b>: ${site ? site : "-"}</p>
+      <p><b>Укажите предполагаемые разделы вашего будущего сайта</b>: ${sections ? sections : "-"}</p>
+      <p><b>Есть ли у вас качественные фото- или видео-материалы для размещения на сайте?</b>: ${stuff ? stuff : "-"}</p>
+      <p><b>Поделитесь ссылками на сайты, которые вам нравятся. Расскажите, почему они нравятся</b>: ${favSites ? favSites : "-"}</p>
+      <p><b>Поделитесь ссылками на сайты, которые вам не нравятся. Почему они не нравятся?</b>: ${hateSites ? hateSites : "-"}</p>
+      <p><b>Укажите услуги, кроме разработки сайта, которые вам необходимы</b>: ${features ? features.join(", ") : "-"}</p>
+      <p><b>Здесь вы можете указать другие пожелания к сайту, о которых мы не спросили:</b>: ${other ? other : "-"}</p>
     `;
 
     const attachments = [
@@ -187,14 +146,7 @@ app.post("/api/brief", async (req, res) => {
       },
     ];
 
-    await sendEmail(
-      attachments,
-      subject,
-      message,
-      send_to,
-      sent_from,
-      reply_to
-    );
+    await sendEmail(attachments, subject, message, send_to, sent_from, reply_to);
     res.status(200).json({ success: true, message: "Brief Sent" });
   } catch (error) {
     res.status(500).json(error.message);
