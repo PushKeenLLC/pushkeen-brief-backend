@@ -76,6 +76,10 @@ app.post("/api/brief", async (req, res) => {
     features,
     other,
   } = req.body;
+
+  // Преобразуем briefType в массив, если он пришел как строка
+  const briefTypeArray = Array.isArray(briefType) ? briefType : [briefType];
+
   try {
     const send_to = [process.env.EMAIL_HEY, process.env.EMAIL_KPM];
     const sent_from = process.env.EMAIL_HEY;
@@ -114,7 +118,7 @@ app.post("/api/brief", async (req, res) => {
       }</p>
 
       ${
-        briefType?.includes("Web-разработка")
+        briefTypeArray.includes("Web-разработка")
           ? `</br>
        </br>
        <p>УСЛУГА: ВЕБ-РАЗРАБОТКА</p>
