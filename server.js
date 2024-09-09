@@ -3,7 +3,6 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const sendEmail = require("./utils/sendEmail");
-const fileupload = require("express-fileupload");
 const multer = require("multer");
 
 const app = express();
@@ -12,7 +11,6 @@ const app = express();
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(cors());
-app.use(fileupload());
 
 // Multer setup
 const upload = multer();
@@ -22,7 +20,7 @@ app.get("/", (_, res) => {
   res.send("Home Page");
 });
 
-app.post("/api/sendemail", upload.none(), async (req, res) => {
+app.post("/api/sendemail", upload.single('file'), async (req, res) => {
   const { name, phone, email, text, services } = req.body;
   try {
     const send_to = [process.env.EMAIL_HEY, process.env.EMAIL_KPM];
@@ -39,9 +37,9 @@ app.post("/api/sendemail", upload.none(), async (req, res) => {
     `;
     const attachments = [
       {
-        filename: req.files?.file?.name,
-        content: req.files?.file?.data,
-        contentType: req.files?.file?.mimetype,
+        filename: req.file?.originalname,
+        content: req.file?.buffer,
+        contentType: req.file?.mimetype,
       },
     ];
 
@@ -52,7 +50,11 @@ app.post("/api/sendemail", upload.none(), async (req, res) => {
   }
 });
 
-app.post("/api/brief", upload.none(), async (req, res) => {
+app.post("/api/brief", upload.fields([
+  { name: 'technicalSpecifications', maxCount: 1 },
+  { name: 'logo', maxCount: 1 },
+  { name: 'brandBook', maxCount: 1 }
+]), async (req, res) => {
   const {
     briefType,
     name,
@@ -68,21 +70,18 @@ app.post("/api/brief", upload.none(), async (req, res) => {
     tasks,
     deadlines,
     offers,
-    // technicalSpecifications,
     site,
     sections,
     stuff,
-    // logo,
-    // brandBook,
     favSites,
     hateSites,
     features,
     other,
   } = req.body;
 
-  // Преобразуем строку в массив, если это необходимо
-  const briefTypeArray = Array.isArray(briefType) ? briefType : [briefType];
-  const featuresArray = Array.isArray(features) ? features : [features];
+  // Convert briefType and features to arrays
+  const briefTypeArray = briefType ? JSON.parse(briefType) : [];
+  const featuresArray = features ? JSON.parse(features) : [];
 
   try {
     const send_to = [process.env.EMAIL_HEY, process.env.EMAIL_KPM];
@@ -127,7 +126,7 @@ app.post("/api/brief", upload.none(), async (req, res) => {
        </br>
        <p>УСЛУГА: ВЕБ-РАЗРАБОТКА</p>
        <p><b>Если у вас есть документ с ТЗ или уже готовый прототип, прикрепите его здесь</b>: ${
-         req.files?.technicalSpecifications ? "Название файла - " + req.files.technicalSpecifications.name : "-"
+         req.files?.technicalSpecifications ? "Название файла - " + req.files.technicalSpecifications[0].originalname : "-"
        }</p>
        <p><b>Предполагаете ли вы создание одностраничного или многостраничного сайта?</b>: ${site ? site : "-"}</p>
        <p><b>Укажите предполагаемые разделы вашего будущего сайта</b>: ${sections ? sections : "-"}</p>
@@ -143,19 +142,19 @@ app.post("/api/brief", upload.none(), async (req, res) => {
 
     const attachments = [
       {
-        filename: req.files?.technicalSpecifications?.name,
-        content: req.files?.technicalSpecifications?.data,
-        contentType: req.files?.technicalSpecifications?.mimetype,
+        filename: req.files?.technicalSpecifications?.[0]?.originalname,
+        content: req.files?.technicalSpecifications?.[0]?.buffer,
+        contentType: req.files?.technicalSpecifications?.[0]?.mimetype,
       },
       {
-        filename: req.files?.logo?.name,
-        content: req.files?.logo?.data,
-        contentType: req.files?.logo?.mimetype,
+        filename: req.files?.logo?.[0]?.originalname,
+        content: req.files?.logo?.[0]?.buffer,
+        contentType: req.files?.logo?.[0]?.mimetype,
       },
       {
-        filename: req.files?.brandBook?.name,
-        content: req.files?.brandBook?.data,
-        contentType: req.files?.brandBook?.mimetype,
+        filename: req.files?.brandBook?.[0]?.originalname,
+        content: req.files?.brandBook?.[0]?.buffer,
+        contentType: req.files?.brandBook?.[0]?.mimetype,
       },
     ];
 
