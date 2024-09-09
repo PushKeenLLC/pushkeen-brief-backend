@@ -25,8 +25,15 @@ exports.sendEmail = async (req, res) => {
     ].filter(Boolean);
 
     await sendEmail(attachments, subject, message, send_to, sent_from, reply_to);
+
+    // Логирование даты и времени отправки
+    const now = new Date().toISOString();
+    console.log(`[${now}] Email sent successfully. Subject: ${subject}`);
+
     res.status(200).json({ success: true, message: 'Email Sent' });
   } catch (error) {
+    const now = new Date().toISOString();
+    console.error(`[${now}] Failed to send email. Error: ${error.message}`);
     res.status(500).json({ success: false, message: error.message });
   }
 };
