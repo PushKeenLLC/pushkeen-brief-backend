@@ -60,7 +60,7 @@ exports.sendBrief = async (req, res) => {
           <p><b>Техническое задание (ТЗ):</b> ${
             req.files?.technicalSpecifications ? `Название файла - ${req.files.technicalSpecifications[0].originalname}` : "-"
           }</p>
-          <p><b>Предполагаете ли вы создание одностраничного или многостраничного сайта?:</b> ${site || "-"}</p>
+          <p><b>Предполагаете ли вы создание одностраничного или многостраничного сайта?</b> ${site || "-"}</p>
           <p><b>Предполагаемые разделы сайта:</b> ${sections || "-"}</p>
           <p><b>Материалы для сайта:</b> ${stuff || "-"}</p>
           <p><b>Любимые сайты:</b> ${favSites || "-"}</p>
@@ -74,16 +74,34 @@ exports.sendBrief = async (req, res) => {
 
     const attachments = [
       req.files?.technicalSpecifications && {
-        filename: req.files.technicalSpecifications[0].originalname,
+        filename: `technicalSpecifications_${req.files.technicalSpecifications[0].originalname}`,
         content: req.files.technicalSpecifications[0].buffer,
         contentType: req.files.technicalSpecifications[0].mimetype,
+      },
+      req.files?.logo && {
+        filename: `logo_${req.files.logo[0].originalname}`,
+        content: req.files.logo[0].buffer,
+        contentType: req.files.logo[0].mimetype,
+      },
+      req.files?.brandBook && {
+        filename: `brandBook_${req.files.brandBook[0].originalname}`,
+        content: req.files.brandBook[0].buffer,
+        contentType: req.files.brandBook[0].mimetype,
       },
     ].filter(Boolean);
 
     await sendEmail(attachments, subject, message, send_to, sent_from, reply_to);
 
+    // Логирование даты и времени отправки, отправителя и получателя
+    const now = new Date().toISOString();
+    console.log(`[${now}] Brief sent successfully. Subject: ${subject}, From: ${sent_from}, To: ${send_to.join(", ")}`);
+
     res.status(200).json({ success: true, message: "Brief Sent" });
   } catch (error) {
+    const now = new Date().toISOString();
+    console.error(
+      `[${now}] Failed to send brief. Error: ${error.message}, From: ${process.env.EMAIL_HEY}, To: ${process.env.EMAIL_HEY}, ${process.env.EMAIL_KPM}`
+    );
     res.status(500).json({ success: false, message: error.message });
   }
 };
