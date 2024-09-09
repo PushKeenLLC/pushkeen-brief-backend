@@ -1,19 +1,19 @@
 const express = require("express");
 const cors = require("cors");
-const bodyParser = require("body-parser");
-const fileupload = require("express-fileupload");
+const multer = require("multer");
 const apiRoutes = require("./routes/api");
 
 const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(bodyParser.json());
 app.use(cors());
-app.use(fileupload());
+
+// Initialize multer for form-data handling
+const upload = multer();
 
 // Routes
-app.use("/api", apiRoutes);
+app.use("/api", upload.fields([{ name: 'file' }, { name: 'technicalSpecifications' }]), apiRoutes);
 
 const PORT = process.env.PORT || 5051;
 app.listen(PORT, () => {
