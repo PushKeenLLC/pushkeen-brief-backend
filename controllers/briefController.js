@@ -78,16 +78,6 @@ exports.sendBrief = async (req, res) => {
         content: req.files.technicalSpecifications[0].buffer,
         contentType: req.files.technicalSpecifications[0].mimetype,
       },
-      req.files?.logo && {
-        filename: `logo_${req.files.logo[0].originalname}`,
-        content: req.files.logo[0].buffer,
-        contentType: req.files.logo[0].mimetype,
-      },
-      req.files?.brandBook && {
-        filename: `brandBook_${req.files.brandBook[0].originalname}`,
-        content: req.files.brandBook[0].buffer,
-        contentType: req.files.brandBook[0].mimetype,
-      },
     ].filter(Boolean);
 
     await sendEmail(attachments, subject, message, send_to, sent_from, reply_to);
