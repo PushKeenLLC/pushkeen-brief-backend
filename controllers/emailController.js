@@ -18,9 +18,9 @@ exports.sendEmail = async (req, res) => {
 
     const attachments = [
       req.files?.file && {
-        filename: req.files.file.name,
-        content: req.files.file.data,
-        contentType: req.files.file.mimetype,
+        filename: req.files.file[0].originalname,
+        content: req.files.file[0].buffer,
+        contentType: req.files.file[0].mimetype,
       },
     ].filter(Boolean);
 
