@@ -4,6 +4,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const sendEmail = require("./utils/sendEmail");
 const fileupload = require("express-fileupload");
+const multer = require("multer");
 
 const app = express();
 
@@ -13,12 +14,15 @@ app.use(bodyParser.json());
 app.use(cors());
 app.use(fileupload());
 
+// Multer setup
+const upload = multer();
+
 // Route
 app.get("/", (_, res) => {
   res.send("Home Page");
 });
 
-app.post("/api/sendemail", async (req, res) => {
+app.post("/api/sendemail", upload.none(), async (req, res) => {
   const { name, phone, email, text, services } = req.body;
   try {
     const send_to = [process.env.EMAIL_HEY, process.env.EMAIL_KPM];
@@ -35,10 +39,9 @@ app.post("/api/sendemail", async (req, res) => {
     `;
     const attachments = [
       {
-        filename: req.files?.file.name,
-        content: req.files?.file.data,
-        // encoding: req.files?.file.encoding,
-        contentType: req.files?.file.mimetype,
+        filename: req.files?.file?.name,
+        content: req.files?.file?.data,
+        contentType: req.files?.file?.mimetype,
       },
     ];
 
@@ -49,7 +52,7 @@ app.post("/api/sendemail", async (req, res) => {
   }
 });
 
-app.post("/api/brief", async (req, res) => {
+app.post("/api/brief", upload.none(), async (req, res) => {
   const {
     briefType,
     name,
@@ -76,6 +79,11 @@ app.post("/api/brief", async (req, res) => {
     features,
     other,
   } = req.body;
+
+  // Преобразуем строку в массив, если это необходимо
+  const briefTypeArray = Array.isArray(briefType) ? briefType : [briefType];
+  const featuresArray = Array.isArray(features) ? features : [features];
+
   try {
     const send_to = [process.env.EMAIL_HEY, process.env.EMAIL_KPM];
     const sent_from = process.env.EMAIL_HEY;
@@ -114,7 +122,7 @@ app.post("/api/brief", async (req, res) => {
       }</p>
 
       ${
-        briefType?.includes("Web-разработка")
+        briefTypeArray?.includes("Web-разработка")
           ? `</br>
        </br>
        <p>УСЛУГА: ВЕБ-РАЗРАБОТКА</p>
@@ -126,7 +134,7 @@ app.post("/api/brief", async (req, res) => {
        <p><b>Есть ли у вас качественные фото- или видео-материалы для размещения на сайте?</b>: ${stuff ? stuff : "-"}</p>
        <p><b>Поделитесь ссылками на сайты, которые вам нравятся. Расскажите, почему они нравятся</b>: ${favSites ? favSites : "-"}</p>
        <p><b>Поделитесь ссылками на сайты, которые вам не нравятся. Почему они не нравятся?</b>: ${hateSites ? hateSites : "-"}</p>
-       <p><b>Укажите услуги, кроме разработки сайта, которые вам необходимы</b>: ${features ? features.join(", ") : "-"}</p>
+       <p><b>Укажите услуги, кроме разработки сайта, которые вам необходимы</b>: ${featuresArray ? featuresArray.join(", ") : "-"}</p>
        <p><b>Здесь вы можете указать другие пожелания к сайту, о которых мы не спросили:</b>: ${other ? other : "-"}</p>`
           : ""
       }
