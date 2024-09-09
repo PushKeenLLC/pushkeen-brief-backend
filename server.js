@@ -3,7 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const sendEmail = require("./utils/sendEmail");
-const fileupload = require("express-fileupload");
+const multer = require("multer");
 
 const app = express();
 
@@ -11,14 +11,16 @@ const app = express();
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(cors());
-app.use(fileupload());
+
+// Multer setup
+const upload = multer();
 
 // Route
 app.get("/", (_, res) => {
   res.send("Home Page");
 });
 
-app.post("/api/sendemail", async (req, res) => {
+app.post("/api/sendemail", upload.single('file'), async (req, res) => {
   const { name, phone, email, text, services } = req.body;
   try {
     const send_to = [process.env.EMAIL_HEY, process.env.EMAIL_KPM];
@@ -35,10 +37,9 @@ app.post("/api/sendemail", async (req, res) => {
     `;
     const attachments = [
       {
-        filename: req.files?.file.name,
-        content: req.files?.file.data,
-        // encoding: req.files?.file.encoding,
-        contentType: req.files?.file.mimetype,
+        filename: req.file?.originalname,
+        content: req.file?.buffer,
+        contentType: req.file?.mimetype,
       },
     ];
 
@@ -49,9 +50,12 @@ app.post("/api/sendemail", async (req, res) => {
   }
 });
 
-app.post("/api/brief", async (req, res) => {
+app.post("/api/brief", upload.fields([
+  { name: 'technicalSpecifications', maxCount: 1 },
+  { name: 'logo', maxCount: 1 },
+  { name: 'brandBook', maxCount: 1 }
+]), async (req, res) => {
   const {
-    briefType,
     name,
     phone,
     email,
@@ -65,17 +69,26 @@ app.post("/api/brief", async (req, res) => {
     tasks,
     deadlines,
     offers,
-    // technicalSpecifications,
     site,
     sections,
     stuff,
-    // logo,
-    // brandBook,
     favSites,
     hateSites,
-    features,
     other,
   } = req.body;
+
+  // Collect briefType and features arrays
+  const briefTypeArray = [];
+  const featuresArray = [];
+
+  for (const key in req.body) {
+    if (key.startsWith('briefType')) {
+      briefTypeArray.push(req.body[key]);
+    } else if (key.startsWith('features')) {
+      featuresArray.push(req.body[key]);
+    }
+  }
+
   try {
     const send_to = [process.env.EMAIL_HEY, process.env.EMAIL_KPM];
     const sent_from = process.env.EMAIL_HEY;
@@ -114,19 +127,19 @@ app.post("/api/brief", async (req, res) => {
       }</p>
 
       ${
-        briefType?.includes("Web-разработка")
+        briefTypeArray?.includes("Web-разработка")
           ? `</br>
        </br>
        <p>УСЛУГА: ВЕБ-РАЗРАБОТКА</p>
        <p><b>Если у вас есть документ с ТЗ или уже готовый прототип, прикрепите его здесь</b>: ${
-         req.files?.technicalSpecifications ? "Название файла - " + req.files.technicalSpecifications.name : "-"
+         req.files?.technicalSpecifications ? "Название файла - " + req.files.technicalSpecifications[0].originalname : "-"
        }</p>
        <p><b>Предполагаете ли вы создание одностраничного или многостраничного сайта?</b>: ${site ? site : "-"}</p>
        <p><b>Укажите предполагаемые разделы вашего будущего сайта</b>: ${sections ? sections : "-"}</p>
        <p><b>Есть ли у вас качественные фото- или видео-материалы для размещения на сайте?</b>: ${stuff ? stuff : "-"}</p>
        <p><b>Поделитесь ссылками на сайты, которые вам нравятся. Расскажите, почему они нравятся</b>: ${favSites ? favSites : "-"}</p>
        <p><b>Поделитесь ссылками на сайты, которые вам не нравятся. Почему они не нравятся?</b>: ${hateSites ? hateSites : "-"}</p>
-       <p><b>Укажите услуги, кроме разработки сайта, которые вам необходимы</b>: ${features ? features.join(", ") : "-"}</p>
+       <p><b>Укажите услуги, кроме разработки сайта, которые вам необходимы</b>: ${featuresArray ? featuresArray.join(", ") : "-"}</p>
        <p><b>Здесь вы можете указать другие пожелания к сайту, о которых мы не спросили:</b>: ${other ? other : "-"}</p>`
           : ""
       }
@@ -135,19 +148,19 @@ app.post("/api/brief", async (req, res) => {
 
     const attachments = [
       {
-        filename: req.files?.technicalSpecifications?.name,
-        content: req.files?.technicalSpecifications?.data,
-        contentType: req.files?.technicalSpecifications?.mimetype,
+        filename: req.files?.technicalSpecifications?.[0]?.originalname,
+        content: req.files?.technicalSpecifications?.[0]?.buffer,
+        contentType: req.files?.technicalSpecifications?.[0]?.mimetype,
       },
       {
-        filename: req.files?.logo?.name,
-        content: req.files?.logo?.data,
-        contentType: req.files?.logo?.mimetype,
+        filename: req.files?.logo?.[0]?.originalname,
+        content: req.files?.logo?.[0]?.buffer,
+        contentType: req.files?.logo?.[0]?.mimetype,
       },
       {
-        filename: req.files?.brandBook?.name,
-        content: req.files?.brandBook?.data,
-        contentType: req.files?.brandBook?.mimetype,
+        filename: req.files?.brandBook?.[0]?.originalname,
+        content: req.files?.brandBook?.[0]?.buffer,
+        contentType: req.files?.brandBook?.[0]?.mimetype,
       },
     ];
 
