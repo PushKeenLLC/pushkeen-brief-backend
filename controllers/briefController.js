@@ -93,8 +93,20 @@ exports.sendBrief = async (req, res) => {
 
     await sendEmail(attachments, subject, message, send_to, sent_from, reply_to);
 
+    // Логирование даты и времени отправки, отправителя и получателя
+    const now = new Date().toISOString();
+    console.log(
+      `[${now}] Brief sent successfully. Subject: ${subject}, From: ${sent_from}, To: ${send_to.join(
+        ', '
+      )}`
+    );
+
     res.status(200).json({ success: true, message: 'Brief Sent' });
   } catch (error) {
+    const now = new Date().toISOString();
+    console.error(
+      `[${now}] Failed to send brief. Error: ${error.message}, From: ${process.env.EMAIL_HEY}, To: ${process.env.EMAIL_HEY}, ${process.env.EMAIL_KPM}`
+    );
     res.status(500).json({ success: false, message: error.message });
   }
 };
