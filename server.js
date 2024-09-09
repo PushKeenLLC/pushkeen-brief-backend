@@ -51,7 +51,7 @@ app.post("/api/sendemail", async (req, res) => {
 
 app.post("/api/brief", async (req, res) => {
   const {
-    briefType,
+    // briefType,
     name,
     phone,
     email,
@@ -113,9 +113,9 @@ app.post("/api/brief", async (req, res) => {
         offers ? offers : "-"
       }</p>
 
-      ${
-        briefType?.includes("Web-разработка")
-          ? `</br>
+      
+      
+       </br>
        </br>
        <p>УСЛУГА: ВЕБ-РАЗРАБОТКА</p>
        <p><b>Если у вас есть документ с ТЗ или уже готовый прототип, прикрепите его здесь</b>: ${
@@ -126,28 +126,14 @@ app.post("/api/brief", async (req, res) => {
        <p><b>Есть ли у вас качественные фото- или видео-материалы для размещения на сайте?</b>: ${stuff ? stuff : "-"}</p>
        <p><b>Поделитесь ссылками на сайты, которые вам нравятся. Расскажите, почему они нравятся</b>: ${favSites ? favSites : "-"}</p>
        <p><b>Поделитесь ссылками на сайты, которые вам не нравятся. Почему они не нравятся?</b>: ${hateSites ? hateSites : "-"}</p>
-       <p><b>Укажите услуги, кроме разработки сайта, которые вам необходимы</b>: ${features ? features.join(", ") : "-"}</p>
-       <p><b>Здесь вы можете указать другие пожелания к сайту, о которых мы не спросили:</b>: ${other ? other : "-"}</p>`
-          : ""
-      }
-      
-    `;
+       <p><b>Укажите услуги, кроме разработки сайта, которые вам необходимы</b>: ${features ? features : "-"}</p>
+       <p><b>Здесь вы можете указать другие пожелания к сайту, о которых мы не спросили:</b>: ${other ? other : "-"}</p>`;
 
     const attachments = [
       {
         filename: req.files?.technicalSpecifications?.name,
         content: req.files?.technicalSpecifications?.data,
         contentType: req.files?.technicalSpecifications?.mimetype,
-      },
-      {
-        filename: req.files?.logo?.name,
-        content: req.files?.logo?.data,
-        contentType: req.files?.logo?.mimetype,
-      },
-      {
-        filename: req.files?.brandBook?.name,
-        content: req.files?.brandBook?.data,
-        contentType: req.files?.brandBook?.mimetype,
       },
     ];
 
