@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
+const fileUpload = require('express-fileupload');
 const apiRoutes = require('./routes/api');
 require('dotenv').config();
 
@@ -10,8 +11,11 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// Initialize multer for form-data handling
+// Initialize multer for handling multipart/form-data
 const upload = multer();
+
+// Initialize express-fileupload
+app.use(fileUpload());
 
 // Routes
 app.use('/api', upload.fields([{ name: 'file' }, { name: 'technicalSpecifications' }]), apiRoutes);
