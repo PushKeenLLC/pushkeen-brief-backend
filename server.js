@@ -1,7 +1,7 @@
-const express = require("express");
-const cors = require("cors");
-const multer = require("multer");
-const apiRoutes = require("./routes/api");
+const express = require('express');
+const cors = require('cors');
+const multer = require('multer');
+const apiRoutes = require('./routes/api');
 require('dotenv').config();
 
 const app = express();
@@ -14,7 +14,7 @@ app.use(cors());
 const upload = multer();
 
 // Routes
-app.use("/api", upload.fields([{ name: 'file' }, { name: 'technicalSpecifications' }]), apiRoutes);
+app.use('/api', upload.fields([{ name: 'file' }, { name: 'technicalSpecifications' }]), apiRoutes);
 
 const PORT = process.env.PORT || 5051;
 app.listen(PORT, () => {
